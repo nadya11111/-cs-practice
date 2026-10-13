@@ -30,20 +30,21 @@ def parse_record(line: str) -> dict:
     }
 
 
-def read_valid(lines: list[str]) -> tuple[list[dict], int]:
+def read_valid(lines: list[str]) -> list[dict]:
     valid_records = []
-    error_count = 0
-
     for line in lines:
         if not line.strip():
-            continue  # пустые строки пропускаем, но НЕ считаем ошибками
+            continue  # пустые строки пропускаем молча
         try:
             record = parse_record(line)
             valid_records.append(record)
         except ValueError:
-            error_count += 1  # считаем только реальные ошибки
+            continue  # негодные строки пропускаем
+    return valid_records
 
-    return valid_records, error_count
+
+
+
 
 
 def average_by_city(records: list[dict]) -> dict:
