@@ -30,27 +30,20 @@ def parse_record(line: str) -> dict:
     }
 
 
-def read_valid(lines: list[str]) -> list[dict]:
-    """
-    Принимает список строк, возвращает список словарей с валидными записями.
-    Пустые строки и строки с ошибками пропускаются.
-    """
+def read_valid(lines: list[str]) -> tuple[list[dict], int]:
     valid_records = []
+    error_count = 0
 
     for line in lines:
-        # Пропускаем пустые строки молча (не считаем их ошибкой)
         if not line.strip():
-            continue
-
-        # Пытаемся разобрать строку
+            continue  # пустые строки пропускаем, но НЕ считаем ошибками
         try:
             record = parse_record(line)
             valid_records.append(record)
         except ValueError:
-            # Если строка негодная — просто пропускаем её
-            continue
+            error_count += 1  # считаем только реальные ошибки
 
-    return valid_records
+    return valid_records, error_count
 
 
 def average_by_city(records: list[dict]) -> dict:
