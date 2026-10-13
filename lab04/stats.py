@@ -5,7 +5,7 @@ def parse_record(line: str) -> dict:
 
     city, temp_str, date = parts
 
-    # Применяем strip() ко всем полям, включая температуру
+    # Очищаем ВСЕ поля от пробелов
     city = city.strip()
     temp_str = temp_str.strip()
     date = date.strip()
@@ -15,15 +15,17 @@ def parse_record(line: str) -> dict:
     if not date:
         raise ValueError("Дата пустая")
 
+    # Заменяем запятую на точку (для чисел вида -3,5)
+    temp_str = temp_str.replace(",", ".")
+
     try:
-        # Теперь temp_str без пробелов, float сработает корректно
         temperature = float(temp_str)
     except ValueError:
         raise ValueError(f"Температура '{temp_str}' не является числом")
 
     return {
         "city": city,
-        "temperature": temperature,  # Изменено на "temperature"
+        "temperature": temperature,
         "date": date
     }
 
