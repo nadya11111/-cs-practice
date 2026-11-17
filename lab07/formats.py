@@ -1,5 +1,4 @@
 import json
-from idlelib.replace import replace
 
 
 def csv_to_records(text):
