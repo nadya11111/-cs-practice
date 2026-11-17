@@ -67,7 +67,7 @@ def parse_settings(lines):
         except ValueError:
             pass
         try:
-            text_val = text_val/replace(',','.')
+            text_val = text_val.replace(',','.')
             return float(text_val)
         except ValueError:
             pass
