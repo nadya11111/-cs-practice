@@ -56,53 +56,57 @@ def merge_by_key(rows, extra, key):
 
 
 def parse_settings(lines):
-    def convert_value(text_val):
-        text_val = text_val.strip()
-        if text_val.lower() == "true" or text_val.lower() == "yes":
-            return True
-        if text_val.lower() == "false" or text_val.lower() == "no":
-            return False
-        try:
-            return int(text_val)
-        except ValueError:
-            pass
-        try:
-            text_val = text_val.replace(',','.')
-            return float(text_val)
-        except ValueError:
-            pass
-        return text_val
+    def cast(x):
+        x = x.strip()
 
-    result = {}
-    current_list_name = ""
+        if x.lower() in ("true", "yes"):
+            return True
+        if x.lower() in ("false", "no"):
+            return False
+
+        try:
+            return int(x)
+        except ValueError:
+            pass
+
+        try:
+            x = x.replace(',', '.')
+            return float(x)
+        except ValueError:
+            pass
+
+        return x
+
+    res = {}
+    lst_key = ""
+
     for line in lines:
         if '#' in line:
-            hash_index = line.find('#')
-            line = line[:hash_index]
+            line = line[:line.find('#')]
 
         line = line.strip()
         if line == "":
             continue
-        if line.startswith("- "):
-            item_text = line[2:]
-            converted_item = convert_value(item_text)
 
-            if current_list_name != "":
-                result[current_list_name].append(converted_item)
+        if line.startswith("- "):
+            item = line[2:]
+            v = cast(item)
+            if lst_key != "":
+                res[lst_key].append(v)
 
         elif ":" in line:
-            parts = line.split(":", 1)
-            key = parts[0].strip()
-            val_str = parts[1].strip()
+            p = line.split(":", 1)
+            k = p[0].strip()
+            v_str = p[1].strip()
 
-            if val_str == "":
-                current_list_name = key
-                result[key] = []
+            if v_str == "":
+                lst_key = k
+                res[k] = []
             else:
-                result[key] = convert_value(val_str)
-                current_list_name = ""
-    return result
+                res[k] = cast(v_str)
+                lst_key = ""
 
+    return res
 
 def records_to_json(records):
     json_string = json.dumps(records, indent=2, ensure_ascii=False, sort_keys=True)
