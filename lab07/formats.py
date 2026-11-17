@@ -6,59 +6,27 @@ def csv_to_records(text):
     if len(lines) == 0:
         return []
 
-    headers_line = lines[0]
-    headers = headers_line.split(',')
-
-    clean_headers = []
-    for h in headers:
-        clean_headers.append(h.strip())
-
-    records = []
+    h = lines[0].split(',')
+    hdr = [x.strip() for x in h]
+    res = []
 
     for i in range(1, len(lines)):
         line = lines[i]
-        if line.strip() == '':
+        if line.strip() == "":
             continue
 
-
-        values = line.split(',')
-
-        record = {}
-
-        for j in range(len(clean_headers)):
-            if j < len(values):
-                val = values[j].strip()
-            else:
-                val = ""
-            header_name = clean_headers[j]
-            record[header_name] = val
-        records.append(record)
-    return records
-
-
-def merge_by_key(rows, extra, key):
-    new_rows = []
-
-    for row in rows:
-        my_key_val = row[key]
-
-        merged_record = {}
-
-        if my_key_val in extra:
-            extra_data = extra[my_key_val]
-            for k in extra_data:
-                merged_record[k] = extra_data[k]
-
-        for k in row:
-            merged_record[k] = row[k]
-        new_rows.append(merged_record)
-    return new_rows
+        vals = line.split(',')
+        d = {}
+        for j in range(len(hdr)):
+            v = vals[j].strip() if j < len(vals) else ""
+            d[hdr[j]] = v
+        res.append(d)
+    return res
 
 
 def parse_settings(lines):
     def cast(x):
         x = x.strip()
-
         if x.lower() in ("true", "yes"):
             return True
         if x.lower() in ("false", "no"):
@@ -70,11 +38,12 @@ def parse_settings(lines):
             pass
 
         try:
-            x = x.replace(',', '.')
+            # Пробуем сделать дробным (сработает только если там ТОЧКА, например 3.5)
             return float(x)
         except ValueError:
             pass
 
+        # Если не получилось, оставляем как есть (например, строку "3,5")
         return x
 
     res = {}
@@ -108,7 +77,18 @@ def parse_settings(lines):
 
     return res
 
-def records_to_json(records):
-    json_string = json.dumps(records, indent=2, ensure_ascii=False, sort_keys=True)
-    return json_string
 
+def merge_by_key(rows, extra, key):
+    res = []
+    for row in rows:
+        k_val = row[key]
+        m = {}
+        if k_val in extra:
+            m.update(extra[k_val])
+        m.update(row)
+        res.append(m)
+    return res
+
+
+def records_to_json(records):
+    return json.dumps(records, indent=2, ensure_ascii=False, sort_keys=True)
