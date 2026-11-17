@@ -38,12 +38,9 @@ def parse_settings(lines):
             pass
 
         try:
-            # Пробуем сделать дробным (сработает только если там ТОЧКА, например 3.5)
             return float(x)
         except ValueError:
             pass
-
-        # Если не получилось, оставляем как есть (например, строку "3,5")
         return x
 
     res = {}
