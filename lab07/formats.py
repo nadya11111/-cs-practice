@@ -1,4 +1,5 @@
 import json
+from idlelib.replace import replace
 
 
 def csv_to_records(text):
@@ -67,6 +68,7 @@ def parse_settings(lines):
         except ValueError:
             pass
         try:
+            text_val = text_val/replace(',','.')
             return float(text_val)
         except ValueError:
             pass
